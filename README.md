@@ -30,5 +30,7 @@
 |:--|:--|
 | `lab/01_leftjoin_and_inner_join` | LEFT JOIN vs INNER JOIN 的输出差异（null 补齐行、回撤墓碑） |
 | `lab/02_join_duplicate_messages` | 双侧同 key 重复消息的 join：笛卡尔积放大，LEFT/INNER 一致 |
+| `lab/03_leftjoin_right_first` | LEFT JOIN 右流先到左流后到：普通 join 永久可匹配，interval join（±1min）超窗不匹配且 null 行延迟输出 |
+| `lab/04_watermark_window_join` | 水位线的作用：窗口结果等水位线关门、join 匹配不等水位线、未匹配 null 行等水位线、双输入取最小值 |
 
 各实验的目的、复现命令和实测结论见对应目录下的 `README.md`。

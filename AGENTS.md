@@ -50,9 +50,12 @@
 - upsert-kafka 的回撤 = 旧主键的墓碑消息（value=null）；主键设计决定"原地更新"还是"删旧增新"
 - upsert-kafka sink 的**主键列不能为 null**：Flink 2.x sink 自带 not-null 约束，写入 null 抛 `EnforcerException` 让作业崩溃重启（可用 `'table.exec.sink.not-null-enforcer'='DROP'` 改成静默丢弃）。LEFT JOIN 的 null 补齐行必须对主键列 `COALESCE` 兜底（实验 01 的 `COALESCE(...,'EMPTY')`、实验 02 的 `COALESCE(r.seq,0)`）
 - 流式 join 双侧同 key 重复消息 = 笛卡尔积放大（M×N），不去重；LEFT/INNER 一致，区别只在未匹配过渡态（实验 02）
+- interval LEFT JOIN 的未匹配 null 行**延迟输出**：要等水位线越过该左行的窗口右边界才发；双输入算子水位线取两侧最小值，造数时两条流都要发晚事件推水位线，否则 null 行永远不落盘（实验 03）
+- 事件时间窗口的聚合结果要等水位线越过窗口结束时间才"定稿"输出；join 匹配行不等水位线立即输出；流停了水位线就停摆，末尾窗口/未匹配行永远挂着不落盘（实验 04）
 - 普通流式 join 的左右流状态默认永久保留：重跑实验必须清理（取消旧作业 + 清 topic），否则新旧结果混杂
 - 同一 checkpoint 批次内多条记录落盘顺序不保证（按 key HashMap 缓冲）
 - source 默认 `scan.startup.mode = 'latest-offset'`（只消费作业启动后的新消息），需回放历史改 `earliest-offset`
 - 公司平台的 `'za.datasource.type' = 'kafka'/'upsert-kafka'` 对应标准 `'connector' = 'kafka'/'upsert-kafka'`，datasource name 即 topic 名
 - macOS 自带 bash 3.2 下 `$VAR` 后紧跟全角字符（如 `（`）会被并入变量名，报 `unbound variable`；脚本里统一写 `${VAR}`
+- Docker Desktop (macOS) 挂载可能失效：宿主机新建的 `lab/` 子目录容器内看不到，甚至 `/opt/flink/lab` 整个变空；`docker compose restart jobmanager taskmanager` 重挂即可（运行中作业会丢，反正都是实验作业）
 - 现有实验 `lab/01_leftjoin_and_inner_join/` 是标准模板，新实验照它复制后改 `JOB_NAME`、topic、SQL 即可
