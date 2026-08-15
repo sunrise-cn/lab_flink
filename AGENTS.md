@@ -29,6 +29,7 @@
    - `send-messages.sh` — 造测试消息，**发送前先清空 source topic**
    - `run.sh` — 一键复现（见下方"标准流程"）
    - `README.md` — 三段式实验说明书：实验目的 / 实验过程（含从项目根目录出发的复现命令）/ 实验结论（附实际观察到的记录原文）
+   - 可选：说明图（如实验 04 的 `timeline.py` 生成 `timeline.png` 嵌入 README），脚本与图都放在实验目录内
 4. SQL 内必须遵守：
    - `SET 'pipeline.name' = 'lab<序号>-<含义>';` 给作业命名，`run.sh` 靠它精准取消本实验旧作业
    - 独立的 `properties.group.id`（建议与 `pipeline.name` 一致），保证消费位点隔离
